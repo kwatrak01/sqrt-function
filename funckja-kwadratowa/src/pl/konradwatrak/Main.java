@@ -1,9 +1,14 @@
 package pl.konradwatrak;
 
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
+
+import pl.konradwatrak.languages.English;
+import pl.konradwatrak.languages.Polish;
 
 public class Main {
 	
@@ -15,12 +20,48 @@ public class Main {
 		run();
 	}
 	
-	private long time;
+	private Language lang;
 	
 	private void run() {
-		time = System.currentTimeMillis();
+		System.out.println("Please select prefered language:");
+		System.out.println("1. Polish");
+		System.out.println("2. English");
 		
-		float[] n = getNumbers();
+		Scanner scanner = new Scanner(System.in);
+		int select = scanner.nextInt();
+		switch (select) {
+			case 1:
+				lang = new Polish();
+				break;
+			case 2:
+				lang = new English();
+				break;
+			default:
+				break;
+		}
+		scanner.close();
+		
+		try {
+			lang.init();
+			HashMap<String, String> map = lang.load();
+//			map.put("INVALID", "Nieprawidlowa operacja!");
+//			map.put("NO_ZEROS", "Brak miejsc zerowych!");
+//			lang.save(map);
+			System.out.println("Loaded:");
+			map.forEach((k, v) -> {
+				System.out.println(k + " -> " + v);
+			});
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		System.out.print("Done!");
+//		calc(getNumbers());
+		
+	}
+	
+	private void calc(float[] n) {
+		long time = System.currentTimeMillis();
+		
 		if (n.length == 0)
 			return;
 		
@@ -42,7 +83,6 @@ public class Main {
 		System.out.println("Policzenie zajelo Ci " + ((System.currentTimeMillis() - time) / 1000) + "s");
 	}
 	
-	@SuppressWarnings("resource")
 	private float[] getNumbers() {
 		Scanner scanner = new Scanner(System.in);
 		StringBuilder builder = new StringBuilder();
