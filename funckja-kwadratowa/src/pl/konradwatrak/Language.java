@@ -13,7 +13,7 @@ public interface Language {
 	void save(Object data) throws IOException;
 	
 	default void init() throws IOException {
-		File file = new File(getPath());
+		File file = new File(getRootPath());
 		if (!file.exists())
 			file.mkdir();
 	}
@@ -26,11 +26,28 @@ public interface Language {
 		return dictionary.getOrDefault(key, "UNDEFINED");
 	}
 	
-	default String getPath(String name) {
-		return getPath() + File.separator + name + ".lang";
+	default String getPath() {
+		return getRootPath() + File.separator + getClassName() + ".lang";
 	}
 	
-	default String getPath() {
+	default String getRootPath() {
 		return Paths.get("").toAbsolutePath() + File.separator + "lang";
+	}
+	
+	default void saveFromTemplate(HashMap<String, String> tempDictionary) throws IOException {
+		File file = new File(getPath());
+		if (file.exists())
+			return;
+		
+		if (!file.createNewFile())
+			throw new IOException("Cannot create language file from template!");
+		
+		save(tempDictionary);
+	}
+	
+	default void saveFromTemplate() throws IOException {}
+	
+	default String getClassName() {
+		return getClass().getName().substring(getClass().getPackageName().length() + 1);
 	}
 }

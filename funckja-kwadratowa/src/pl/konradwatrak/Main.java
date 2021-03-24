@@ -2,7 +2,6 @@ package pl.konradwatrak;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
@@ -21,14 +20,15 @@ public class Main {
 	}
 	
 	private Language lang;
+	private Scanner scanner;
 	
 	private void run() {
+		scanner = new Scanner(System.in);
 		System.out.println("Please select prefered language:");
 		System.out.println("1. Polish");
 		System.out.println("2. English");
 		
-		Scanner scanner = new Scanner(System.in);
-		int select = scanner.nextInt();
+		Integer select = Integer.parseInt(scanner.nextLine());
 		switch (select) {
 			case 1:
 				lang = new Polish();
@@ -37,25 +37,19 @@ public class Main {
 				lang = new English();
 				break;
 			default:
+				lang = new English();
 				break;
 		}
-		scanner.close();
 		
 		try {
 			lang.init();
-			HashMap<String, String> map = lang.load();
-//			map.put("INVALID", "Nieprawidlowa operacja!");
-//			map.put("NO_ZEROS", "Brak miejsc zerowych!");
-//			lang.save(map);
-			System.out.println("Loaded:");
-			map.forEach((k, v) -> {
-				System.out.println(k + " -> " + v);
-			});
+			lang.saveFromTemplate();
+			lang.initDictionary(lang.load());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		System.out.print("Done!");
-//		calc(getNumbers());
+		
+		calc(getNumbers());
 		
 	}
 	
@@ -71,28 +65,28 @@ public class Main {
 			float x1 = (-n[1] - (float)Math.sqrt(delta)) / 2 * n[0];
 			float x2 = (-n[1] + (float)Math.sqrt(delta)) / 2 * n[0];
 			
-			System.out.println("Miejsca zerowe x1=" + x1 + " x2=" + x2);
+			System.out.println(lang.t("ZERO_PLACES_FULL").replace("%x1%", x1 + "").replace("%x2%", x2 + ""));
 		} else if (delta < 0) {
-			System.out.println("Brak miejsc zerowych");
+			System.out.println(lang.t("ZERO_PLACES_NONE"));
 		} else {
 			float x0 = -n[1]/2*n[0];
 			
-			System.out.println("Miejsce zerowe x0=" + x0);
+			System.out.println(lang.t("ZERO_PLACES_PART").replace("%x0%", x0 + ""));
 		}
 		
-		System.out.println("Policzenie zajelo Ci " + ((System.currentTimeMillis() - time) / 1000) + "s");
+		scanner.close();
+		System.out.println(lang.t("COUNTER").replace("%time%", ((System.currentTimeMillis() - time) / 1000) + "s"));
 	}
 	
 	private float[] getNumbers() {
-		Scanner scanner = new Scanner(System.in);
 		StringBuilder builder = new StringBuilder();
 		
 		System.out.println("A,B,C: ");
-		builder.append(scanner.next());
+		builder.append(scanner.nextLine());
 		
 		List<String> args = Arrays.asList(builder.toString().split(","));
 		if (args.size() < 3) {
-			System.err.println("Invalid input");
+			System.err.println(lang.t("INVALID_INPUT"));
 			return new float[0];
 		}
 		

@@ -14,9 +14,10 @@ import pl.konradwatrak.Language;
 
 public class English implements Language {
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public HashMap<String, String> load() throws IOException {
-		File file = new File(getPath(English.class.getCanonicalName().toLowerCase()));
+		File file = new File(getPath());
 		if (!file.exists())
 			throw new IOException("Language file is not exist!");
 		
@@ -46,11 +47,22 @@ public class English implements Language {
 			bytes = stream.toByteArray();
 		}
 		
-		File file = new File(getPath(English.class.getCanonicalName().toLowerCase()));
+		File file = new File(getPath());
 		
 		try (FileOutputStream output = new FileOutputStream(file)) {
 			output.write(bytes);
 		}
+	}
+	
+	@Override
+	public void saveFromTemplate() throws IOException {
+		HashMap<String, String> tempDictionary = new HashMap<String, String>();
+		tempDictionary.put("ZERO_PLACES_FULL", "Two zero places x1=%x1% x2=%x2%");
+		tempDictionary.put("ZERO_PLACES_PART", "One zero place x0=%x0%");
+		tempDictionary.put("ZERO_PLACES_NONE", "No zero places!");
+		tempDictionary.put("COUNTER", "Calculate time: %time%");
+		tempDictionary.put("INVALID_INPUT", "Invalid input");
+		Language.super.saveFromTemplate(tempDictionary);
 	}
 
 }
